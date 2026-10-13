@@ -1,4 +1,4 @@
-/* Dark Admin — shared behaviour. No jQuery; Bootstrap 5 handles its own widgets. */
+/* Dark Admin — shared behavior. No jQuery; Bootstrap 5 handles its own widgets. */
 (function () {
   'use strict';
 

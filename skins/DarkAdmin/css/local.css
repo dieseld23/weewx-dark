@@ -8,7 +8,7 @@
      3. adds the admin shell (fixed sidebar, feed, timeline, lists)
 
    The first line is the credit of the Bootstrap 3 theme this began as, kept
-   from its stylesheet. That local.css was a 6,278-line recoloured fork of
+   from its stylesheet. That local.css was a 6,278-line recolored fork of
    Bootstrap 3. Everything it duplicated now comes from Bootstrap itself, and
    what is here was rewritten for Bootstrap 5.
    ========================================================================== */
@@ -23,7 +23,7 @@ html {
 
 /* --------------------------------------------------------------------------
    1. Palette
-   Cyborg's greys are flat black (#060606) and mid-grey (#222). These deepen
+   Cyborg's grays are flat black (#060606) and mid-gray (#222). These deepen
    the page, lift the surfaces off it and add a tinted mid-tone, so panels read
    as layers rather than as boxes drawn on a void.
    -------------------------------------------------------------------------- */
@@ -100,7 +100,7 @@ html {
     "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 }
 
-/* Ambient colour wash. Kept as background-image so background-color stays a
+/* Ambient color wash. Kept as background-image so background-color stays a
    solid, known value — contrast tooling (and the fallback path) still resolve
    the page background correctly. */
 body {
@@ -128,7 +128,7 @@ h1, h2, h3, h4, h5, h6,
   font-weight: 600;
 }
 
-/* Cyborg leaves several surfaces on its own flat greys. */
+/* Cyborg leaves several surfaces on its own flat grays. */
 .card,
 .dropdown-menu,
 .list-group-item,
@@ -143,9 +143,9 @@ h1, h2, h3, h4, h5, h6,
 
 /* Cyborg ships `border: 0 solid #fff` on .form-control, so a field is a filled
    block with no edge. Setting border-color alone -- as this rule did -- changes
-   nothing at all, because there is no width for the colour to apply to: the
+   nothing at all, because there is no width for the color to apply to: the
    declaration reads as intentional and does nothing, which is the worst of both.
-   The width and style are restored here so the colour means something, and so a
+   The width and style are restored here so the color means something, and so a
    disabled field is still distinguishable from the surface it sits on. */
 .form-control,
 .form-select,
@@ -189,7 +189,7 @@ h1, h2, h3, h4, h5, h6,
   border-color: var(--da-border);
   background-color: var(--da-surface-2);
   color: var(--da-muted);
-  opacity: 1;                /* Bootstrap's 0.65 on top of a muted grey is a fade too far */
+  opacity: 1;                /* Bootstrap's 0.65 on top of a muted gray is a fade too far */
 }
 
 .btn-outline-secondary,
@@ -222,7 +222,7 @@ h1, h2, h3, h4, h5, h6,
 /* --------------------------------------------------------------------------
    2. Contrast corrections
    Cyborg puts white text on primary, success, warning and light. Those land at
-   2.4–3.0:1, under the WCAG AA minimum of 4.5:1. Dark text on the same colours
+   2.4–3.0:1, under the WCAG AA minimum of 4.5:1. Dark text on the same colors
    reaches 7.0–8.8:1.
    -------------------------------------------------------------------------- */
 
@@ -232,7 +232,7 @@ h1, h2, h3, h4, h5, h6,
   color: #08090b !important;
 }
 
-/* Cyborg's "light" is a dark grey, so it keeps light text. */
+/* Cyborg's "light" is a dark gray, so it keeps light text. */
 .text-bg-light {
   color: #fff !important;
 }
@@ -270,7 +270,7 @@ h1, h2, h3, h4, h5, h6,
 
 /* Cyborg's purple info (#93c) and red danger (#c00) work as fills but are too
    dark to read AS text on this background (3.4:1 and 3.3:1). These lightened
-   variants clear 4.5:1 while staying the same hue. Its muted grey (#555) is
+   variants clear 4.5:1 while staying the same hue. Its muted gray (#555) is
    only 2.6:1, so that lifts too. Primary, success and warning already pass. */
 :root,
 [data-bs-theme="dark"] {
@@ -279,7 +279,7 @@ h1, h2, h3, h4, h5, h6,
 
   --bs-info-text-emphasis: var(--da-info-text);
   --bs-danger-text-emphasis: var(--da-danger-text);
-  /* Not a second hard-coded grey: this is the SAME muted tone as :root sets, and
+  /* Not a second hard-coded gray: this is the SAME muted tone as :root sets, and
      having two that differ by a few points is how they drift apart. The value
      here used to be #9aa3af, close enough to --da-muted to look like a mistake
      and far enough to be one. */
@@ -462,7 +462,7 @@ figure figcaption {
   background-color: var(--da-hover);
 }
 
-/* The active pill takes the colour of its own nav item, so the highlight
+/* The active pill takes the color of its own nav item, so the highlight
    matches the icon rather than always being blue. */
 .navbar .navbar-nav.side-nav .nav-link.active {
   color: #fff;
@@ -470,10 +470,10 @@ figure figcaption {
   box-shadow: inset 3px 0 0 var(--da-blue);
 }
 
-/* An earlier revision cycled five hues here, so the selected item's colour
+/* An earlier revision cycled five hues here, so the selected item's color
    depended on its POSITION in the list rather than on anything true about it.
-   Removed deliberately: in an admin UI colour should carry meaning -- an alarm,
-   a job running, a connection lost -- and a nav that spends five colours on
+   Removed deliberately: in an admin UI color should carry meaning -- an alarm,
+   a job running, a connection lost -- and a nav that spends five colors on
    decoration leaves nothing to say those things with. The single accent above
    applies to whichever item is active. */
 
@@ -486,7 +486,7 @@ figure figcaption {
 }
 
 /* The five-hue icon cycle is removed for the same reason as the active states
-   above: colour is a signal, not an index. Icons inherit the muted tone set in
+   above: color is a signal, not an index. Icons inherit the muted tone set in
    the rule above, and go white with their label when the item is active. */
 
 @media (min-width: 768px) {
@@ -534,8 +534,8 @@ figure figcaption {
 
 /* --------------------------------------------------------------------------
    Cards (was .panel in Bootstrap 3)
-   Bootstrap 3 panels used a saturated colour bar for the heading. Modern
-   practice is a quiet header with the colour carried by a small icon, so the
+   Bootstrap 3 panels used a saturated color bar for the heading. Modern
+   practice is a quiet header with the color carried by a small icon, so the
    accent marks the section without shouting over its own content.
    -------------------------------------------------------------------------- */
 
@@ -568,7 +568,7 @@ figure figcaption {
   border-top: 1px solid var(--da-border);
 }
 
-/* Accent cards: colour lives in the icon and a hairline at the top. */
+/* Accent cards: color lives in the icon and a hairline at the top. */
 .card-accent { position: relative; overflow: hidden; }
 
 .card-accent::before {
@@ -605,8 +605,8 @@ figure figcaption {
 
 /* --------------------------------------------------------------------------
    KPI tiles
-   The coloured metric row a dashboard opens with. Add .stat-<hue> to pick one
-   of the five theme colours.
+   The colored metric row a dashboard opens with. Add .stat-<hue> to pick one
+   of the five theme colors.
    -------------------------------------------------------------------------- */
 
 .stat-card {
@@ -733,7 +733,7 @@ figure figcaption {
   border-radius: 50%;
 }
 
-/* Feed icons carry the colour of what happened, not one flat blue. */
+/* Feed icons carry the color of what happened, not one flat blue. */
 .feed-item .icon.blue   { color: var(--da-blue-text);   background-color: var(--da-blue-soft); }
 .feed-item .icon.green  { color: var(--da-green-text);  background-color: var(--da-green-soft); }
 .feed-item .icon.purple { color: var(--da-purple-text); background-color: var(--da-purple-soft); }
@@ -788,7 +788,7 @@ figure figcaption {
   border-radius: 50%;
 }
 
-/* Avatars cycle the palette so a list of people isn't a column of grey discs. */
+/* Avatars cycle the palette so a list of people isn't a column of gray discs. */
 .news-list li:nth-child(5n + 1) .avatar,
 .users-list li:nth-child(5n + 1) .avatar { color: var(--da-blue-text);   background-color: var(--da-blue-soft); }
 .news-list li:nth-child(5n + 2) .avatar,
@@ -1033,17 +1033,17 @@ table.sortable th[aria-sort="descending"]::after { content: "\f0dd"; opacity: 1;
 .text-da-red    { color: var(--da-red-text) !important; }
 
 /* An earlier revision painted the wordmark with a background gradient clipped
-   to the text (white -> blue -> purple). Removed: colour here carries meaning,
+   to the text (white -> blue -> purple). Removed: color here carries meaning,
    and a product name is not state. Plain text also drops the three-way fallback
    the gradient required -- background-clip:text renders text INVISIBLE wherever
-   it is unsupported, so the gradient had to restore a solid colour for old
+   it is unsupported, so the gradient had to restore a solid color for old
    engines and for Windows High Contrast. Plain text needs none of that. */
 
 @media print {
   .navbar-admin .navbar-brand { color: #000; }
 }
 
-/* Inline code picks up the accent instead of sitting grey.
+/* Inline code picks up the accent instead of sitting gray.
    The chip is OPAQUE on purpose. A translucent tint composites with whatever
    is behind it, so the same chip measured 5.06:1 on the page but only 4.04:1
    inside a lighter hero block. An opaque chip is context-independent: 5.98:1

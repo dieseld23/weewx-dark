@@ -274,7 +274,7 @@ then run this again (or pass --keep-timezone to carry on regardless)."
 
     [ "$(date +%Y)" -ge 2026 ] || die "the system clock says $(date) - fix the clock first"
     if [ "$(timedatectl show -p NTPSynchronized --value 2>/dev/null || true)" != yes ]; then
-        warn "the clock is not NTP-synchronised yet (timedatectl); WeeWX timestamps depend on it"
+        warn "the clock is not NTP-synchronized yet (timedatectl); WeeWX timestamps depend on it"
     fi
 }
 
@@ -732,7 +732,7 @@ if 'rain' not in deltas:
     put(deltas, 'rain', 'rain_total', '[SDR][[deltas]]')
 put(deltas, 'lightning_strike_count', 'strikes_total', '[SDR][[deltas]]')
 
-# The driver splits cmd on single spaces, so keep it normalised. A comma in
+# The driver splits cmd on single spaces, so keep it normalized. A comma in
 # it that was not quoted makes a list of it, which the driver cannot split at
 # all; the commas go back where they were, and it is written out quoted.
 cmd = sdr.get('cmd')
@@ -880,11 +880,15 @@ for name in rep.sections:
     if not os.path.isdir(os.path.join(skin_root, other['skin'])):
         other['enable'] = 'false'
         changes.append('[StdReport][[%s]] enable = false (skin %s is not installed here)' % (name, other['skin']))
+    elif str(other['skin']).lower() in ('ftp', 'rsync'):
+        # WeeWX's two uploaders send the pages somewhere else. They read the
+        # directory and write nothing into it, so they stay as they are.
+        continue
     elif absolute(other.get('HTML_ROOT', rep.get('HTML_ROOT', 'public_html'))) == dark_root:
         other['enable'] = 'false'
         changes.append('[StdReport][[%s]] enable = false (it writes into the same directory as DarkAdmin)' % name)
 
-# Where the database is, for the checks the installer makes afterwards.
+# Where the database is, for the checks the installer makes afterward.
 db = ''
 try:
     binding = cfg['DataBindings']['wx_binding']['database']
@@ -1470,7 +1474,7 @@ setup_security_updates() {
     # Someone may have set automatic updates up on this machine already; say
     # so once, the first time this narrows them, rather than change it silently.
     if pkg_installed unattended-upgrades && [ ! -e /etc/apt/apt.conf.d/60security-updates-0400 ]; then
-        warn "unattended-upgrades was already installed here. Its earlier settings stay in /etc/apt/apt.conf.d/ but are now overridden by 60security-updates-0400: Debian security updates only, 04:00, no automatic reboot. Delete that file to go back."
+        warn "unattended-upgrades was already installed here. Its earlier settings stay in /etc/apt/apt.conf.d/ but are now overridden by 60security-updates-0400: Debian security updates only, 04:00, no automatic reboot. The README, \"Security updates\", says how to go back."
     fi
     apt_install unattended-upgrades
     cat >/etc/apt/apt.conf.d/60security-updates-0400 <<'EOF'

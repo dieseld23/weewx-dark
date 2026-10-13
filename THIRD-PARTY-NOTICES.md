@@ -3,12 +3,12 @@
 [LICENSE](LICENSE) covers what was written for this project. It does not
 cover the files below, which are other people's work, under their own terms.
 They are shipped unmodified, with one exception. The Bootswatch build,
-`bootstrap/css/bootstrap.min.css`, has had its Google Fonts `@import` removed
-and is otherwise as published.
+`skins/DarkAdmin/vendor/bootstrap/css/bootstrap.min.css`, has had its Google
+Fonts `@import` removed and is otherwise as published.
 
 ## In `skins/DarkAdmin/vendor/`
 
-| File | Component | Copyright | Licence |
+| File | Component | Copyright | License |
 |---|---|---|---|
 | `bootstrap/css/bootstrap.min.css` | Bootstrap 5.3.8 | Copyright 2011-2025 The Bootstrap Authors | MIT |
 | | Bootswatch 5.3.8, theme Cyborg | Copyright 2012-2025 Thomas Park | MIT |
@@ -22,7 +22,7 @@ and is otherwise as published.
 
 The copyright lines are the ones each file carries in its own header, with
 two exceptions. Popper's is not repeated in the bundle and is taken from
-Popper's licence file. The font files say only "Copyright (c) Font Awesome"
+Popper's license file. The font files say only "Copyright (c) Font Awesome"
 about themselves; the line given for them is the one in the header of
 `all.min.css`, which comes from the same release.
 
@@ -53,7 +53,7 @@ THE SOFTWARE.
 
 ### Font Awesome Free
 
-Its licence, in full at <https://fontawesome.com/license/free>, has three
+Its license, in full at <https://fontawesome.com/license/free>, has three
 parts:
 
 - **Icons: CC BY 4.0** (<https://creativecommons.org/licenses/by/4.0/>). It
@@ -62,7 +62,7 @@ parts:
 - **Fonts: SIL OFL 1.1** (<https://scripts.sil.org/OFL>). It covers the
   `.woff2` files. Its text is beside them, in
   `skins/DarkAdmin/vendor/fontawesome/OFL.txt`, under the notice Font
-  Awesome's own licence file gives for the fonts.
+  Awesome's own license file gives for the fonts.
 - **Code: MIT** (above). It covers `all.min.css`.
 
 ## Design lineage
@@ -82,7 +82,7 @@ first line of `local.css`.
 License, version 3. It is a snapshot of
 <https://github.com/matthewwall/weewx-sdr> at commit
 `bdb14acef7c5e30f4982cc38284686c223c449ca`, unmodified, with the full text of
-its licence in the file `license` inside the archive. It is a separate work:
+its license in the file `license` inside the archive. It is a separate work:
 the station installer hands it to WeeWX's own extension installer and nothing
 here is derived from it.
 

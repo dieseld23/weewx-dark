@@ -1,5 +1,5 @@
 /*
- * DarkAdmin — WeeWX behaviour layer
+ * DarkAdmin — WeeWX behavior layer
  *
  * Four jobs:
  *   1. Draw the charts from the JSON that CheetahGenerator emits into data/.
@@ -302,7 +302,7 @@
   }
 
   /* Whether every line on a chart is read off in whole numbers. Its axis is
-     then labelled in whole numbers too, not 2.5 and 3.5. */
+     then labeled in whole numbers too, not 2.5 and 3.5. */
   function allWhole(datasets) {
     for (var i = 0; i < datasets.length; i++) {
       if (!/%\.0f/.test(datasets[i].valueFormat || '')) return false;
@@ -437,7 +437,7 @@
    *
    *   data-live-field="ordinal"    the compass point of a direction
    *   data-live-format="%.0f lx"   the bare number, formatted here
-   *   data-live-band="uv"          also carries a band: its colour, and its
+   *   data-live-band="uv"          also carries a band: its color, and its
    *                                name in the .band-word element beside it
    *   data-live="time"             when the readings were taken
    * -------------------------------------------------------------------- */

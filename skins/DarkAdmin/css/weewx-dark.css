@@ -5,7 +5,7 @@
    weather-specific component (chart frames, hi/lo tables, the staleness
    banner) or a small correction where weather content meets the admin shell.
 
-   All colour comes from the --da-* custom properties defined in local.css, so
+   All color comes from the --da-* custom properties defined in local.css, so
    the palette stays in one place. Nothing here redefines a Bootstrap
    component; that is local.css's job.
    ========================================================================== */
@@ -142,9 +142,9 @@
 /* --------------------------------------------------------------------------
    UV index risk bands (WHO scale)
 
-   Colours are the theme's own accents, chosen from the -text variants where
+   Colors are the theme's own accents, chosen from the -text variants where
    the raw hue is too dark to read on a card. Low deliberately stays in the
-   body colour: colouring the safe case trains the eye to ignore the warning.
+   body color: coloring the safe case trains the eye to ignore the warning.
    -------------------------------------------------------------------------- */
 
 .uv-low      { color: var(--da-text); }
@@ -156,14 +156,14 @@
 /* --------------------------------------------------------------------------
    Reception: signal-to-noise bands and the sensor's battery flag
 
-   The same rule as for UV: the good case keeps the colour of the text around
+   The same rule as for UV: the good case keeps the color of the text around
    it, so .snr-strong has no rule of its own.
    -------------------------------------------------------------------------- */
 
 .snr-fair { color: #f2c744; }
 .snr-weak { color: var(--da-red-text); }
 
-/* On the value itself, so it has to outrank the stat card's own colour. */
+/* On the value itself, so it has to outrank the stat card's own color. */
 .stat-card .stat-value.battery-low { color: var(--da-red-text); }
 
 /* The band's name, beside the value it describes. */
