@@ -1,0 +1,126 @@
+#errorCatcher Echo
+#set global $page_title = 'Records'
+#include "head.inc"
+
+                <div class="row g-3" data-slot="records">
+
+                    <div class="col-12">
+                        <div class="card card-accent border-primary">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-trophy"></i> All-time records</h2>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0 hilo-table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Observation</th>
+                                                <th scope="col">Highest</th>
+                                                <th scope="col">When</th>
+                                                <th scope="col">Lowest</th>
+                                                <th scope="col">When</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+#for $x in $DisplayOptions.get('observations_period', [])
+#if $getVar('alltime.' + $x + '.has_data')
+                                            <tr>
+                                                <th scope="row">$obs.label[$x]</th>
+                                                <td class="hi">$getVar('alltime.' + $x + '.max')</td>
+                                                <td class="t">$getVar('alltime.' + $x + '.maxtime')</td>
+                                                <td class="lo">$getVar('alltime.' + $x + '.min')</td>
+                                                <td class="t">$getVar('alltime.' + $x + '.mintime')</td>
+                                            </tr>
+#end if
+#end for
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card card-accent border-info">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-cloud-rain"></i> Rainfall totals</h2>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-borderless align-middle mb-0 kv-table">
+                                    <tbody>
+                                        <tr><th scope="row">Today</th><td>$day.rain.sum</td></tr>
+                                        <tr><th scope="row">This week</th><td>$week.rain.sum</td></tr>
+                                        <tr><th scope="row">This month</th><td>$month.rain.sum</td></tr>
+                                        <tr><th scope="row">This year</th><td>$year.rain.sum</td></tr>
+                                        <tr><th scope="row">Rain year</th><td>$rainyear.rain.sum</td></tr>
+                                        <tr><th scope="row">All time</th><td>$alltime.rain.sum</td></tr>
+                                        <tr><th scope="row">Greatest daily total</th><td>$alltime.rain.maxsum &mdash; <span class="t">$alltime.rain.maxsumtime</span></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card card-accent border-warning">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-wind"></i> Wind extremes</h2>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-borderless align-middle mb-0 kv-table">
+                                    <tbody>
+                                        <tr><th scope="row">Highest gust</th><td>$alltime.windGust.max &mdash; <span class="t">$alltime.windGust.maxtime</span></td></tr>
+                                        <tr><th scope="row">Highest speed</th><td>$alltime.windSpeed.max &mdash; <span class="t">$alltime.windSpeed.maxtime</span></td></tr>
+                                        <tr><th scope="row">Average, all time</th><td>$alltime.windSpeed.avg</td></tr>
+                                        <tr><th scope="row">Prevailing direction</th><td>$alltime.wind.vecdir.ordinal_compass</td></tr>
+## The database column is 'lightning_strike_count'. The sensor sends a running
+## total, which the weewx-sdr [[deltas]] section turns into strikes per packet
+## before it gets here (README, "Lightning"). Guarded, so a station without a
+## lightning sensor simply omits the row.
+#if $year.lightning_strike_count.has_data
+                                        <tr><th scope="row">Lightning strikes, this year</th><td>$year.lightning_strike_count.sum</td></tr>
+#end if
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-calendar-days"></i> Month by month &mdash; $year.dateTime.format("%Y")</h2>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0 hilo-table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Month</th>
+                                                <th scope="col">High</th>
+                                                <th scope="col">Low</th>
+                                                <th scope="col">Average</th>
+                                                <th scope="col">Rain</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+#for $m in $year.months
+#if $m.outTemp.has_data
+                                            <tr>
+                                                <th scope="row">$m.dateTime.format("%B")</th>
+                                                <td class="hi">$m.outTemp.max</td>
+                                                <td class="lo">$m.outTemp.min</td>
+                                                <td>$m.outTemp.avg</td>
+                                                <td>$m.rain.sum</td>
+                                            </tr>
+#end if
+#end for
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+#include "footer.inc"

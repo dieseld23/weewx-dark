@@ -1,0 +1,16 @@
+# Everything here is deployed to a Linux host -- WeeWX runs on the Pi, not on
+# the machine the files are edited on. Line endings must stay LF in the
+# working copy even when checked out on Windows: install.sh with CRLF fails
+# on Linux with "bad interpreter: /bin/bash^M", and Cheetah templates are
+# read by a Python process that expects Unix text.
+* text=auto eol=lf
+
+# Fonts are binary; never touch them.
+*.woff2 binary
+*.woff  binary
+*.ttf   binary
+*.eot   binary
+*.png   binary
+*.jpg   binary
+*.ico   binary
+*.zip   binary

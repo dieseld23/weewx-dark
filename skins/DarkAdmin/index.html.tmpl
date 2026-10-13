@@ -1,0 +1,200 @@
+#errorCatcher Echo
+#set global $page_title = 'Dashboard'
+#include "head.inc"
+
+                <div class="row g-3" data-slot="stats">
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="stat-card stat-blue h-100">
+                            <span class="stat-icon"><i class="fa-solid fa-temperature-half"></i></span>
+                            <div>
+                                <div class="stat-label">$obs.label.outTemp</div>
+                                <div class="stat-value" data-live="outTemp">$current.outTemp</div>
+                                <div class="stat-delta">
+                                    <i class="fa-solid fa-arrow-up"></i> $day.outTemp.max
+                                    <i class="fa-solid fa-arrow-down ms-2"></i> $day.outTemp.min
+                                    <span class="stat-period">today</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="stat-card stat-green h-100">
+                            <span class="stat-icon"><i class="fa-solid fa-droplet"></i></span>
+                            <div>
+                                <div class="stat-label">$obs.label.outHumidity</div>
+                                <div class="stat-value" data-live="outHumidity">$current.outHumidity</div>
+                                <div class="stat-delta">
+                                    <i class="fa-solid fa-arrow-up"></i> $day.outHumidity.max
+                                    <i class="fa-solid fa-arrow-down ms-2"></i> $day.outHumidity.min
+                                    <span class="stat-period">today</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="stat-card stat-orange h-100">
+                            <span class="stat-icon"><i class="fa-solid fa-wind"></i></span>
+                            <div>
+                                <div class="stat-label">$obs.label.windSpeed</div>
+                                <div class="stat-value" data-live="windSpeed">$current.windSpeed</div>
+                                <div class="stat-delta">
+                                    <i class="fa-solid fa-compass"></i> <span data-live="windDir" data-live-field="ordinal">$current.windDir.ordinal_compass</span>
+                                    <span class="stat-period">gust $day.windGust.max today</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="stat-card stat-purple h-100">
+                            <span class="stat-icon"><i class="fa-solid fa-cloud-rain"></i></span>
+                            <div>
+                                <div class="stat-label">$obs.label.rain</div>
+                                <div class="stat-value">$day.rain.sum</div>
+                                <div class="stat-delta">
+                                    <span class="stat-period">$month.rain.sum this month &middot; $year.rain.sum this year</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-lg-8">
+                        <div class="card card-accent border-primary h-100">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-chart-area"></i> Temperature &amp; Dew Point &mdash; today</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-box">
+                                    <canvas data-chart="line" data-src="data/day.json"
+                                            data-series="outTemp,dewpoint"
+                                            data-colors="blue,purple"
+                                            aria-label="Temperature and dew point over the last 24 hours" role="img"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card card-accent border-warning h-100">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-sun"></i> Almanac</h2>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-borderless align-middle mb-0 kv-table">
+                                    <tbody data-slot="almanac">
+#if $almanac.hasExtras
+                                        <tr><th scope="row"><i class="fa-solid fa-arrow-up text-warning"></i> Sunrise</th><td>$almanac.sun.rise</td></tr>
+                                        <tr><th scope="row"><i class="fa-solid fa-arrow-down text-warning"></i> Sunset</th><td>$almanac.sun.set</td></tr>
+#else
+                                        <tr><th scope="row"><i class="fa-solid fa-arrow-up text-warning"></i> Sunrise</th><td>$almanac.sunrise</td></tr>
+                                        <tr><th scope="row"><i class="fa-solid fa-arrow-down text-warning"></i> Sunset</th><td>$almanac.sunset</td></tr>
+#end if
+                                        <tr><th scope="row"><i class="fa-solid fa-moon"></i> Moon</th><td>$almanac.moon_phase, $almanac.moon_fullness&#37; full</td></tr>
+#if $day.barometer.has_data
+                                        <tr><th scope="row"><i class="fa-solid fa-gauge"></i> $obs.label.barometer</th><td data-live="barometer">$current.barometer</td></tr>
+                                        <tr><th scope="row"><i class="fa-solid fa-arrow-trend-up"></i> Trend</th><td>$trend.barometer</td></tr>
+#end if
+## UV risk banding, WHO scale: 0-2 low, 3-5 moderate, 6-7 high, 8-10 very
+## high, 11+ extreme. Written as nested conditional expressions rather than a
+## chain of #else if, which keeps it to one evaluation of the raw value.
+#set $uvband = ''
+#set $uvword = ''
+#if $current.UV.has_data
+#set $uvv = $current.UV.raw
+#set $uvband = 'uv-extreme' if $uvv >= 11 else ('uv-veryhigh' if $uvv >= 8 else ('uv-high' if $uvv >= 6 else ('uv-moderate' if $uvv >= 3 else 'uv-low')))
+#set $uvword = 'Extreme' if $uvv >= 11 else ('Very high' if $uvv >= 8 else ('High' if $uvv >= 6 else ('Moderate' if $uvv >= 3 else 'Low')))
+#end if
+                                        <tr><th scope="row"><i class="fa-solid fa-sun"></i> $obs.label.UV</th><td><span class="$uvband" data-live="UV" data-live-band="uv">$current.UV</span>#if $uvword#<span class="band-word">$uvword</span>#end if#</td></tr>
+#if $day.lightning_strike_count.has_data
+                                        <tr><th scope="row"><i class="fa-solid fa-bolt text-warning"></i> $obs.label.lightning_strike_count</th><td>$day.lightning_strike_count.sum today</td></tr>
+#end if
+## The sensor keeps repeating the distance of the last strike it saw, so the
+## figure only means something on a day that has had one. rtl_433 passes it
+## through undecoded (0-31, believed to be miles) -- hence "about".
+#if $day.lightning_strike_count.has_data and $day.lightning_strike_count.sum.raw > 0 and $current.lightning_distance.has_data
+                                        <tr><th scope="row"><i class="fa-solid fa-bolt-lightning"></i> $obs.label.lightning_distance</th><td>about $current.lightning_distance.format("%.0f")</td></tr>
+#end if
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card card-accent border-success">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-wind"></i> Wind &mdash; today</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-box chart-box-sm">
+                                    <canvas data-chart="line" data-src="data/day.json"
+                                            data-series="windSpeed,windGust"
+                                            data-colors="green,orange"
+                                            aria-label="Wind speed and gusts over the last 24 hours" role="img"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card card-accent border-info">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-cloud-rain"></i> Rainfall &mdash; today</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-box chart-box-sm">
+                                    <canvas data-chart="bar" data-src="data/day.json"
+                                            data-series="rain" data-colors="blue"
+                                            aria-label="Rainfall over the last 24 hours" role="img"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-table-list"></i> Highs &amp; lows today</h2>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0 hilo-table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Observation</th>
+                                                <th scope="col">Current</th>
+                                                <th scope="col">High</th>
+                                                <th scope="col">Time</th>
+                                                <th scope="col">Low</th>
+                                                <th scope="col">Time</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody data-slot="hilo">
+#for $x in $DisplayOptions.get('observations_period', [])
+#if $getVar('day.' + $x + '.has_data')
+                                            <tr>
+                                                <th scope="row">$obs.label[$x]</th>
+                                                <td data-live="$x">$getVar('current.' + $x)</td>
+                                                <td class="hi">$getVar('day.' + $x + '.max')</td>
+                                                <td class="t">$getVar('day.' + $x + '.maxtime')</td>
+                                                <td class="lo">$getVar('day.' + $x + '.min')</td>
+                                                <td class="t">$getVar('day.' + $x + '.mintime')</td>
+                                            </tr>
+#end if
+#end for
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+#include "footer.inc"

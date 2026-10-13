@@ -1,0 +1,238 @@
+#errorCatcher Echo
+#set global $page_title = 'Station'
+#include "head.inc"
+
+                <div class="row g-3" data-slot="station">
+
+                    <div class="col-lg-6">
+                        <div class="card card-accent border-primary h-100">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-location-dot"></i> Location</h2>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-borderless align-middle mb-0 kv-table">
+                                    <tbody>
+                                        <tr><th scope="row">Location</th><td>$station.location</td></tr>
+                                        <tr><th scope="row">Latitude</th><td>$station.latitude[0]&deg; $station.latitude[1]&prime; $station.latitude[2]</td></tr>
+                                        <tr><th scope="row">Longitude</th><td>$station.longitude[0]&deg; $station.longitude[1]&prime; $station.longitude[2]</td></tr>
+                                        <tr><th scope="row">Altitude</th><td>$station.altitude</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card card-accent border-info h-100">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-server"></i> Software &amp; hardware</h2>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-borderless align-middle mb-0 kv-table">
+                                    <tbody>
+                                        <tr><th scope="row">Hardware</th><td>$station.hardware</td></tr>
+                                        <tr><th scope="row">WeeWX version</th><td>$station.version</td></tr>
+                                        <tr><th scope="row">WeeWX uptime</th><td>$station.uptime.long_form</td></tr>
+                                        <tr><th scope="row">Server uptime</th><td>$station.os_uptime.long_form</td></tr>
+                                        <tr><th scope="row">Report generated</th><td>$current.dateTime</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="card card-accent border-warning">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-signal"></i> Reception health</h2>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-body-secondary small mb-3">
+                                    Archive records actually written, against what a fully-reporting station would
+                                    produce. A large shortfall means packets are not reaching the receiver &mdash;
+                                    the station is transmitting less often than the archive interval, or not at all.
+                                </p>
+## How much of a period its records account for: the minutes they cover, each
+## record by its own interval so that a change of archive_interval does not
+## upset the figure, against the minutes from the period's start to the
+## newest record.
+#set $day_cover = ''
+#set $week_cover = ''
+#if $current.interval.has_data
+#set $newest = $current.dateTime.raw
+#if $day.interval.has_data and $newest > $day.start.raw
+#set $day_cover = '%.0f' % min(100.0, 6000.0 * $day.interval.sum.raw / ($newest - $day.start.raw))
+#end if
+#if $week.interval.has_data and $newest > $week.start.raw
+#set $week_cover = '%.0f' % min(100.0, 6000.0 * $week.interval.sum.raw / ($newest - $week.start.raw))
+#end if
+#end if
+## The battery is a flag, not a measurement: the sensor says only whether its
+## batteries are still good. weewx-sdr stores 0 for good and 1 for low, and an
+## archive record holds the average of its packets, so anything above 0 means
+## that at least one of them said low.
+#set $batt_word = 'N/A'
+#set $batt_class = ''
+#set $batt_icon = 'fa-battery-empty'
+#set $batt_note = 'not reported by the sensor'
+#if $current.outTempBatteryStatus.has_data
+#if $current.outTempBatteryStatus.raw > 0
+#set $batt_word = 'Low'
+#set $batt_class = 'battery-low'
+#set $batt_icon = 'fa-battery-quarter'
+#set $batt_note = 'replace the sensor&rsquo;s batteries soon'
+#else
+#set $batt_word = 'OK'
+#set $batt_icon = 'fa-battery-full'
+#set $batt_note = 'as the sensor itself reports'
+#end if
+#end if
+                                <div class="row g-3">
+                                    <div class="col-sm-6 col-xl-3">
+                                        <div class="stat-card stat-blue h-100">
+                                            <span class="stat-icon"><i class="fa-solid fa-clock"></i></span>
+                                            <div>
+                                                <div class="stat-label">Last observation</div>
+                                                <div class="stat-value fs-5">$current.dateTime.format("%H:%M")</div>
+                                                <div class="stat-delta"><span class="stat-period">$current.dateTime.format("%d %b %Y")</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-xl-3">
+                                        <div class="stat-card stat-green h-100">
+                                            <span class="stat-icon"><i class="fa-solid fa-database"></i></span>
+                                            <div>
+                                                <div class="stat-label">Records today</div>
+                                                <div class="stat-value">$day.outTemp.count</div>
+                                                <div class="stat-delta"><span class="stat-period">temperature samples#if $day_cover# &middot; $day_cover% of the day so far on record#end if#</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-xl-3">
+                                        <div class="stat-card stat-orange h-100">
+                                            <span class="stat-icon"><i class="fa-solid fa-calendar-week"></i></span>
+                                            <div>
+                                                <div class="stat-label">Records this week</div>
+                                                <div class="stat-value">$week.outTemp.count</div>
+                                                <div class="stat-delta"><span class="stat-period">temperature samples#if $week_cover# &middot; $week_cover% of the week so far on record#end if#</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-xl-3">
+                                        <div class="stat-card stat-purple h-100">
+                                            <span class="stat-icon"><i class="fa-solid $batt_icon"></i></span>
+                                            <div>
+                                                <div class="stat-label">$obs.label.outTempBatteryStatus</div>
+                                                <div class="stat-value fs-5 $batt_class">$batt_word</div>
+                                                <div class="stat-delta"><span class="stat-period">$batt_note</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="text-body-secondary small mt-4 mb-3">
+                                    How well the antenna hears the sensor, as rtl_433 measures every packet it decodes.
+                                    Signal level and noise floor are in dB below the most the receiver can take in,
+                                    so both are negative and a quieter background is a lower noise floor.
+                                    Signal-to-noise is the distance between the two: the figure to watch while
+                                    moving the antenna.
+                                </p>
+## The three figures are in the archive only if weewx.conf maps them there
+## (README, "Reception"), and on a database that has no such columns
+## $current.signal2 would print as ?'signal2'? and its .raw would stop this
+## page being generated at all. Hence every tag behind has_data. The live feed
+## needs none of that, and fills the same elements in from the packets.
+##
+## Signal-to-noise in words: this skin's own rule of thumb, which
+## js/weewx-dark.js applies to the live value as well.
+#set $snr_class = ''
+#set $snr_word = ''
+#if $current.signal2.has_data
+#set $snr = $current.signal2.raw
+#set $snr_class = 'snr-strong' if $snr >= 20 else ('snr-fair' if $snr >= 12 else 'snr-weak')
+#set $snr_word = 'Strong' if $snr >= 20 else ('Fair' if $snr >= 12 else 'Weak')
+#end if
+                                <div class="row g-3">
+                                    <div class="col-sm-6 col-xl-4">
+                                        <div class="stat-card stat-green h-100">
+                                            <span class="stat-icon"><i class="fa-solid fa-satellite-dish"></i></span>
+                                            <div>
+                                                <div class="stat-label">$obs.label.signal2</div>
+                                                <div class="stat-value fs-5"><span class="$snr_class" data-live="signal2" data-live-format="%.1f dB" data-live-band="snr">#if $current.signal2.has_data#$current.signal2.format("%.1f dB", add_label=False)#else#N/A#end if#</span>#if $snr_word#<span class="band-word">$snr_word</span>#end if#</div>
+                                                <div class="stat-delta"><span class="stat-period">#if $day.signal2.has_data#today $day.signal2.min.format("%.1f", add_label=False) to $day.signal2.max.format("%.1f dB", add_label=False)#else#the sensor above the background#end if#</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-xl-4">
+                                        <div class="stat-card stat-blue h-100">
+                                            <span class="stat-icon"><i class="fa-solid fa-wave-square"></i></span>
+                                            <div>
+                                                <div class="stat-label">$obs.label.signal1</div>
+                                                <div class="stat-value fs-5"><span data-live="signal1" data-live-format="%.1f dB">#if $current.signal1.has_data#$current.signal1.format("%.1f dB", add_label=False)#else#N/A#end if#</span></div>
+                                                <div class="stat-delta"><span class="stat-period">#if $day.signal1.has_data#today $day.signal1.min.format("%.1f", add_label=False) to $day.signal1.max.format("%.1f dB", add_label=False)#else#how strongly the sensor arrives#end if#</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-xl-4">
+                                        <div class="stat-card stat-orange h-100">
+                                            <span class="stat-icon"><i class="fa-solid fa-volume-low"></i></span>
+                                            <div>
+                                                <div class="stat-label">$obs.label.noise</div>
+                                                <div class="stat-value fs-5"><span data-live="noise" data-live-format="%.1f dB">#if $current.noise.has_data#$current.noise.format("%.1f dB", add_label=False)#else#N/A#end if#</span></div>
+                                                <div class="stat-delta"><span class="stat-period">#if $day.noise.has_data#today $day.noise.min.format("%.1f", add_label=False) to $day.noise.max.format("%.1f dB", add_label=False)#else#the background the sensor has to beat#end if#</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title h6"><i class="fa-solid fa-list-check"></i> Current readings, all observations</h2>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0 hilo-table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Observation</th>
+                                                <th scope="col">Current</th>
+                                                <th scope="col">High today</th>
+                                                <th scope="col">Low today</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+#for $x in $DisplayOptions.get('observations_current', [])
+#if $getVar('current.' + $x + '.has_data')
+                                            <tr>
+                                                <th scope="row">$obs.label[$x]</th>
+## WeeWX has a unit group for 'illuminance' (lux) but none for 'luminosity',
+## the column the weewx-sdr sensor map writes the Atlas's light reading to.
+## With no group the value gets a bare "%f" and no label: "22900.000000".
+## The unit therefore goes in the format string; add_label=False stops a
+## second one appearing if the type is ever given a group. A missing value
+## never reaches the format string, so it still prints as skin.conf's NONE.
+#if $x == 'luminosity'
+                                                <td data-live="luminosity" data-live-format="%.0f lx">$current.luminosity.format("%.0f lx", add_label=False)</td>
+                                                <td class="hi">$day.luminosity.max.format("%.0f lx", add_label=False)</td>
+                                                <td class="lo">$day.luminosity.min.format("%.0f lx", add_label=False)</td>
+#else
+                                                <td data-live="$x">$getVar('current.' + $x)</td>
+                                                <td class="hi">$getVar('day.' + $x + '.max')</td>
+                                                <td class="lo">$getVar('day.' + $x + '.min')</td>
+#end if
+                                            </tr>
+#end if
+#end for
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+#include "footer.inc"

@@ -1,0 +1,24 @@
+# Generated report output. WeeWX writes these to HTML_ROOT, never into the
+# skin directory, so they should not appear here -- but they do if anyone
+# points HTML_ROOT at the working copy while testing.
+*.html
+!skins/DarkAdmin/*.html.tmpl
+data/*.json
+skins/DarkAdmin/data/*.json
+!skins/DarkAdmin/data/*.json.tmpl
+
+# Local install artifacts
+*.bak
+*.bak.*
+*.tgz
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python bytecode, in case a search-list extension is added later
+__pycache__/
+*.py[cod]

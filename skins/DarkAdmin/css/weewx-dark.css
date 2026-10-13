@@ -1,0 +1,300 @@
+/* ==========================================================================
+   DarkAdmin — WeeWX layer
+   --------------------------------------------------------------------------
+   Loaded after css/local.css and additive to it. Everything here is either a
+   weather-specific component (chart frames, hi/lo tables, the staleness
+   banner) or a small correction where weather content meets the admin shell.
+
+   All colour comes from the --da-* custom properties defined in local.css, so
+   the palette stays in one place. Nothing here redefines a Bootstrap
+   component; that is local.css's job.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Page heading
+   -------------------------------------------------------------------------- */
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--bs-heading-color);
+  margin: 0;
+}
+
+.page-subtitle {
+  color: var(--da-muted);
+  font-size: 0.9375rem;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Outage banner
+
+   Filled in by js/weewx-dark.js once nothing has been heard from the sensor
+   for [Extras] outage_seconds. It is the difference between "this station
+   reports nothing right now" and "this page is broken", which matters a great
+   deal when every value on the page has already rendered as N/A.
+   -------------------------------------------------------------------------- */
+
+.staleness-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--da-orange);
+  border-left-width: 3px;
+  border-radius: var(--bs-border-radius);
+  background: rgba(255, 136, 0, 0.10);
+  color: var(--da-text);
+}
+
+.staleness-banner .icon {
+  color: var(--da-orange-text);
+  font-size: 1.125rem;
+  line-height: 1.5;
+  flex: none;
+}
+
+.staleness-banner strong {
+  color: var(--bs-emphasis-color);
+  display: block;
+}
+
+.staleness-banner .detail {
+  color: var(--da-muted);
+  font-size: 0.875rem;
+}
+
+/* While the radio is out and the readings come from Weather Underground:
+   whatever it has no value for (light level, strike distance) is still the
+   radio's last word, and should not pass for current next to values that are. */
+[data-live].live-stale,
+.band-word.live-stale {
+  opacity: 0.45;
+}
+
+/* --------------------------------------------------------------------------
+   Charts
+
+   Fixed-height frames. A canvas with no height constraint and
+   maintainAspectRatio:false collapses to zero, and one with the constraint on
+   the canvas itself fights Chart.js's own resize handling — so the height
+   lives on the wrapper.
+   -------------------------------------------------------------------------- */
+
+.chart-box {
+  position: relative;
+  height: 340px;
+}
+
+.chart-box-sm {
+  height: 240px;
+}
+
+/* No width rule here on purpose. Chart.js sets the canvas's inline width and
+   height itself and watches the element with a ResizeObserver; an
+   `!important` width overrides what it just wrote, the observer fires again,
+   and the two fight in a loop that pins the renderer at 100% CPU. The parent
+   .chart-box supplies the height, `maintainAspectRatio: false` does the rest,
+   and Chart.js handles width on its own. */
+
+/* Shown in place of a chart when the series came back empty. */
+.chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 0.5rem;
+  color: var(--da-muted);
+  text-align: center;
+}
+
+.chart-empty i {
+  font-size: 1.75rem;
+  opacity: 0.5;
+}
+
+/* --------------------------------------------------------------------------
+   Spacing between top-level rows
+
+   Bootstrap gives a gutter row `margin-top: calc(-1 * var(--bs-gutter-y))` to
+   cancel the matching margin it puts on each column. Two stacked rows are
+   therefore pulled 1rem CLOSER than their own margin-bottom suggests -- with
+   `mb-1` the dashboard's stat row overlapped the chart row by 10px, measured.
+   Setting the gap here, sized to absorb that negative margin, keeps the
+   spacing honest no matter which utility class the markup uses.
+   -------------------------------------------------------------------------- */
+
+#page-wrapper > .container-fluid > .row:not(:last-of-type) {
+  margin-bottom: calc(1.25rem + var(--bs-gutter-y, 0px));
+}
+
+/* --------------------------------------------------------------------------
+   UV index risk bands (WHO scale)
+
+   Colours are the theme's own accents, chosen from the -text variants where
+   the raw hue is too dark to read on a card. Low deliberately stays in the
+   body colour: colouring the safe case trains the eye to ignore the warning.
+   -------------------------------------------------------------------------- */
+
+.uv-low      { color: var(--da-text); }
+.uv-moderate { color: #f2c744; }
+.uv-high     { color: var(--da-orange-text); }
+.uv-veryhigh { color: var(--da-red-text); }
+.uv-extreme  { color: var(--da-purple-text); font-weight: 600; }
+
+/* --------------------------------------------------------------------------
+   Reception: signal-to-noise bands and the sensor's battery flag
+
+   The same rule as for UV: the good case keeps the colour of the text around
+   it, so .snr-strong has no rule of its own.
+   -------------------------------------------------------------------------- */
+
+.snr-fair { color: #f2c744; }
+.snr-weak { color: var(--da-red-text); }
+
+/* On the value itself, so it has to outrank the stat card's own colour. */
+.stat-card .stat-value.battery-low { color: var(--da-red-text); }
+
+/* The band's name, beside the value it describes. */
+.band-word {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  color: var(--da-muted);
+  margin-left: 0.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   Key/value tables (almanac, station facts)
+   -------------------------------------------------------------------------- */
+
+.kv-table th {
+  font-weight: 500;
+  color: var(--da-muted);
+  white-space: nowrap;
+  width: 45%;
+}
+
+.kv-table td {
+  color: var(--bs-emphasis-color);
+  text-align: right;
+}
+
+.kv-table th i {
+  width: 1.25rem;
+  text-align: center;
+  margin-right: 0.375rem;
+  opacity: 0.85;
+}
+
+/* --------------------------------------------------------------------------
+   High / low tables
+   -------------------------------------------------------------------------- */
+
+.hilo-table th[scope="row"] {
+  font-weight: 500;
+  color: var(--da-text);
+  white-space: nowrap;
+}
+
+.hilo-table thead th {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--da-muted);
+  border-bottom-color: var(--da-border-strong);
+}
+
+.hilo-table .hi {
+  color: var(--da-orange-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.hilo-table .lo {
+  color: var(--da-blue-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.hilo-table td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Timestamps sit beside the value they belong to and must not compete with
+   it. 8.7:1 on the card surface — quiet, not switched off. */
+.hilo-table .t,
+.kv-table .t {
+  color: var(--da-muted);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Navbar readouts
+   -------------------------------------------------------------------------- */
+
+.navbar-admin .nav-reading,
+.navbar-admin .nav-timestamp {
+  color: var(--da-muted);
+  font-size: 0.875rem;
+  cursor: default;
+}
+
+.navbar-admin .nav-reading i,
+.navbar-admin .nav-timestamp i {
+  margin-right: 0.25rem;
+  opacity: 0.8;
+}
+
+@media (max-width: 767.98px) {
+  .navbar-admin .nav-reading,
+  .navbar-admin .nav-timestamp {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+
+.page-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  margin: 2rem 0 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--da-border);
+  color: var(--da-muted);
+  font-size: 0.875rem;
+}
+
+.page-footer a {
+  color: var(--da-blue-text);
+}
+
+/* --------------------------------------------------------------------------
+   Stat cards — weather values run longer than the theme's "18,472", so let
+   them shrink rather than overflow the card.
+   -------------------------------------------------------------------------- */
+
+.stat-card .stat-value {
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+  .stat-card .stat-value {
+    font-size: 1.5rem;
+  }
+}

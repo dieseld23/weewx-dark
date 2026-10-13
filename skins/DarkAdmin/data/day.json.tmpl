@@ -1,0 +1,99 @@
+#errorCatcher Echo
+##
+## Chart data for the "day" period. Consumed by js/weewx-dark.js.
+##
+## Emitted with encoding=utf8 (set in skin.conf); html_entities would corrupt
+## the unit labels.
+##
+## The lines are the archive records themselves, one point each, so they are
+## as fine as archive_interval in weewx.conf: a point a minute at 60. Asking
+## .series() to aggregate instead costs a database query for every point, and
+## leaves an empty bin wherever the bin is narrower than the records.
+##
+## Taken this way, a stretch with no records is simply absent, not null. The
+## chart breaks its line across any stretch longer than max_gap: ten minutes,
+## or three archive intervals where that is longer.
+##
+## Rain stays in five-minute bars, which .series() fills with null where
+## there is nothing: 1440 bars a day would be too thin to read.
+##
+#set $every = 300
+#if $current.interval.has_data
+#set $every = int($current.interval.raw * 60)
+#end if
+#set $rain_every = max(300, $every)
+{
+  "period": "day",
+  "label": "Today",
+  "generated": ${current.dateTime.raw * 1000},
+  "max_gap": ${max(600, 3 * $every) * 1000},
+  "units": {
+    "outTemp": "$unit.label.outTemp",
+    "outHumidity": "$unit.label.outHumidity",
+    "windSpeed": "$unit.label.windSpeed",
+    "barometer": "$unit.label.barometer",
+    "rain": "$unit.label.rain"
+  },
+## How temperature and wind are printed when a value is read off the chart:
+## as the pages print them, which skin.conf makes whole numbers. The lines
+## themselves are drawn from the figures as measured. Rounded points would
+## make a line climb in steps.
+  "formats": {
+    "outTemp": "$unit.format.outTemp",
+    "dewpoint": "$unit.format.dewpoint",
+    "windSpeed": "$unit.format.windSpeed",
+    "windGust": "$unit.format.windGust"
+  },
+  "series": {
+    "outTemp":
+#if $day.outTemp.has_data
+$day.outTemp.series(time_series='start', time_unit='unix_epoch_ms').round(2).json
+#else
+[]
+#end if
+    ,
+    "dewpoint":
+#if $day.dewpoint.has_data
+$day.dewpoint.series(time_series='start', time_unit='unix_epoch_ms').round(2).json
+#else
+[]
+#end if
+    ,
+    "outHumidity":
+#if $day.outHumidity.has_data
+$day.outHumidity.series(time_series='start', time_unit='unix_epoch_ms').round(1).json
+#else
+[]
+#end if
+    ,
+    "windSpeed":
+#if $day.windSpeed.has_data
+$day.windSpeed.series(time_series='start', time_unit='unix_epoch_ms').round(2).json
+#else
+[]
+#end if
+    ,
+## Each record's gust is already the highest wind of its interval.
+    "windGust":
+#if $day.windGust.has_data
+$day.windGust.series(time_series='start', time_unit='unix_epoch_ms').round(2).json
+#else
+[]
+#end if
+    ,
+    "barometer":
+#if $day.barometer.has_data
+$day.barometer.series(time_series='start', time_unit='unix_epoch_ms').round(3).json
+#else
+[]
+#end if
+    ,
+    "rain":
+#if $day.rain.has_data
+$day.rain.series(aggregate_type='sum', aggregate_interval=$rain_every, time_series='start', time_unit='unix_epoch_ms').round(3).json
+#else
+[]
+#end if
+
+  }
+}

@@ -1,0 +1,81 @@
+#errorCatcher Echo
+##
+## Chart data for the "week" period. Consumed by js/weewx-dark.js.
+##
+## Emitted with encoding=utf8 (set in skin.conf); html_entities would corrupt
+## the unit labels. Series come from WeeWX's .series() tag, which renders
+## missing values as null on its own -- Chart.js draws those as gaps.
+##
+{
+  "period": "week",
+  "label": "This Week",
+  "generated": ${current.dateTime.raw * 1000},
+  "units": {
+    "outTemp": "$unit.label.outTemp",
+    "outHumidity": "$unit.label.outHumidity",
+    "windSpeed": "$unit.label.windSpeed",
+    "barometer": "$unit.label.barometer",
+    "rain": "$unit.label.rain"
+  },
+## How temperature and wind are printed when a value is read off the chart:
+## as the pages print them, which skin.conf makes whole numbers. The lines
+## themselves are drawn from the figures as measured. Rounded points would
+## make a line climb in steps.
+  "formats": {
+    "outTemp": "$unit.format.outTemp",
+    "dewpoint": "$unit.format.dewpoint",
+    "windSpeed": "$unit.format.windSpeed",
+    "windGust": "$unit.format.windGust"
+  },
+  "series": {
+    "outTemp":
+#if $week.outTemp.has_data
+$week.outTemp.series(aggregate_type='avg', aggregate_interval='hour', time_series='start', time_unit='unix_epoch_ms').round(2).json
+#else
+[]
+#end if
+    ,
+    "dewpoint":
+#if $week.dewpoint.has_data
+$week.dewpoint.series(aggregate_type='avg', aggregate_interval='hour', time_series='start', time_unit='unix_epoch_ms').round(2).json
+#else
+[]
+#end if
+    ,
+    "outHumidity":
+#if $week.outHumidity.has_data
+$week.outHumidity.series(aggregate_type='avg', aggregate_interval='hour', time_series='start', time_unit='unix_epoch_ms').round(1).json
+#else
+[]
+#end if
+    ,
+    "windSpeed":
+#if $week.windSpeed.has_data
+$week.windSpeed.series(aggregate_type='avg', aggregate_interval='hour', time_series='start', time_unit='unix_epoch_ms').round(2).json
+#else
+[]
+#end if
+    ,
+    "windGust":
+#if $week.windGust.has_data
+$week.windGust.series(aggregate_type='max', aggregate_interval='hour', time_series='start', time_unit='unix_epoch_ms').round(2).json
+#else
+[]
+#end if
+    ,
+    "barometer":
+#if $week.barometer.has_data
+$week.barometer.series(aggregate_type='avg', aggregate_interval='hour', time_series='start', time_unit='unix_epoch_ms').round(3).json
+#else
+[]
+#end if
+    ,
+    "rain":
+#if $week.rain.has_data
+$week.rain.series(aggregate_type='sum', aggregate_interval='hour', time_series='start', time_unit='unix_epoch_ms').round(3).json
+#else
+[]
+#end if
+
+  }
+}

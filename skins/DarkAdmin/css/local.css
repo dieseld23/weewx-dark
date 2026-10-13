@@ -1,0 +1,1068 @@
+/* Dark Admin Bootstrap Theme by PrepBootstrap - http://www.prepbootstrap.com */
+/* ==========================================================================
+   Dark Admin — theme layer on top of Bootstrap 5.3 (Bootswatch Cyborg)
+   --------------------------------------------------------------------------
+   Bootswatch supplies the component CSS and the blue accent. This file:
+     1. retunes the surface palette through Bootstrap's own theme variables
+     2. fixes the places where Cyborg's contrast falls below WCAG AA
+     3. adds the admin shell (fixed sidebar, feed, timeline, lists)
+
+   The first line is the credit of the Bootstrap 3 theme this began as, kept
+   from its stylesheet. That local.css was a 6,278-line recoloured fork of
+   Bootstrap 3. Everything it duplicated now comes from Bootstrap itself, and
+   what is here was rewritten for Bootstrap 5.
+   ========================================================================== */
+
+/* Bootstrap 5 bases everything on a 16px root; the original theme was 14px.
+   Scaling the root by 87.5% restores that density across type AND spacing,
+   since Bootstrap sizes both in rem. It stays a percentage rather than a fixed
+   px so it still tracks the reader's own browser font-size setting. */
+html {
+  font-size: 87.5%;
+}
+
+/* --------------------------------------------------------------------------
+   1. Palette
+   Cyborg's greys are flat black (#060606) and mid-grey (#222). These deepen
+   the page, lift the surfaces off it and add a tinted mid-tone, so panels read
+   as layers rather than as boxes drawn on a void.
+   -------------------------------------------------------------------------- */
+
+:root,
+[data-bs-theme="dark"] {
+  --da-bg: #0b0d10;
+  --da-surface: #15181d;
+  --da-surface-2: #1c2027;
+  --da-hover: #22272f;
+  --da-accent: #2a9fd6;
+  --da-accent-soft: rgba(42, 159, 214, 0.14);
+
+  /* ---- The original Cyborg hues, used as a full palette -----------------
+     Each hue has three roles:
+       --da-<hue>        the fill      (solid backgrounds)
+       --da-<hue>-text   readable text on a dark surface
+       --da-<hue>-soft   16% tint      (subtle fills; the -text variant
+                                        clears 4.5:1 on top of it)
+     Purple and red are too dark to read as text at full strength (3.4:1 and
+     3.3:1), so their -text variants are lightened with the hue preserved.
+     Everything below was measured, not guessed. */
+  --da-blue: #2a9fd6;
+  --da-blue-text: #2a9fd6;
+  --da-blue-soft: rgba(42, 159, 214, 0.16);
+
+  --da-green: #77b300;
+  --da-green-text: #77b300;
+  --da-green-soft: rgba(119, 179, 0, 0.16);
+
+  --da-purple: #9933cc;
+  --da-purple-text: #b56bda;
+  --da-purple-soft: rgba(153, 51, 204, 0.16);
+
+  --da-orange: #ff8800;
+  --da-orange-text: #ff8800;
+  --da-orange-soft: rgba(255, 136, 0, 0.16);
+
+  --da-red: #cc0000;
+  --da-red-text: #ff4040;
+  --da-red-soft: rgba(204, 0, 0, 0.16);
+  --da-text: #c9ced5;
+  /* Secondary text. Lightened from #8e97a3, which measured a legal 6.1:1 on the
+     card surface and still read as switched-off rather than secondary — the
+     numbers passed and the screen did not. 9.4:1 on the page, 8.7:1 on a card. */
+  --da-muted: #adb5bd;
+  --da-border: rgba(255, 255, 255, 0.09);
+  --da-border-strong: rgba(255, 255, 255, 0.15);
+
+  --da-topbar-height: 3.5rem;
+  --da-sidebar-width: 14.5rem;
+
+  --da-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --da-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --da-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+
+  /* Feed Bootstrap's own variables so every component follows along. */
+  --bs-body-bg: var(--da-bg);
+  --bs-body-color: var(--da-text);
+  --bs-emphasis-color: #f2f5f8;
+  --bs-heading-color: #eef2f6;
+  --bs-secondary-color: var(--da-muted);
+  --bs-secondary-bg: var(--da-surface-2);
+  --bs-tertiary-bg: var(--da-surface);
+  --bs-border-color: var(--da-border);
+  --bs-border-color-translucent: var(--da-border);
+
+  --bs-border-radius: 0.5rem;
+  --bs-border-radius-sm: 0.375rem;
+  --bs-border-radius-lg: 0.75rem;
+  --bs-border-radius-xl: 1rem;
+
+  --bs-body-font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+/* Ambient colour wash. Kept as background-image so background-color stays a
+   solid, known value — contrast tooling (and the fallback path) still resolve
+   the page background correctly. */
+body {
+  min-height: 100vh;
+  background-color: var(--da-bg);
+  background-image:
+    radial-gradient(60rem 32rem at 12% -8%, rgba(42, 159, 214, 0.10), transparent 60%),
+    radial-gradient(50rem 28rem at 88% -4%, rgba(153, 51, 204, 0.09), transparent 60%),
+    radial-gradient(48rem 30rem at 60% 108%, rgba(119, 179, 0, 0.05), transparent 60%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: var(--da-text);
+  padding-top: var(--da-topbar-height);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(42, 159, 214, 0.32);
+  color: #fff;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  letter-spacing: -0.011em;
+  font-weight: 600;
+}
+
+/* Cyborg leaves several surfaces on its own flat greys. */
+.card,
+.dropdown-menu,
+.list-group-item,
+.modal-content,
+.offcanvas,
+.accordion-item,
+.accordion-button,
+.popover {
+  background-color: var(--da-surface);
+  border-color: var(--da-border);
+}
+
+/* Cyborg ships `border: 0 solid #fff` on .form-control, so a field is a filled
+   block with no edge. Setting border-color alone -- as this rule did -- changes
+   nothing at all, because there is no width for the colour to apply to: the
+   declaration reads as intentional and does nothing, which is the worst of both.
+   The width and style are restored here so the colour means something, and so a
+   disabled field is still distinguishable from the surface it sits on. */
+.form-control,
+.form-select,
+.input-group-text {
+  background-color: var(--da-surface-2);
+  border: 1px solid var(--da-border-strong);
+  color: var(--da-text);
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--da-surface-2);
+  color: var(--da-text);
+  border-color: var(--da-accent);
+  box-shadow: 0 0 0 0.2rem var(--da-accent-soft);
+}
+
+.form-control::placeholder {
+  color: var(--da-muted);
+}
+
+/* ── Disabled states ──────────────────────────────────────────────────────
+   Cyborg sets these for a light page and this layer had not touched them, so
+   every disabled control fell back to values that only work on white:
+
+     .form-control:disabled       border-color: transparent  — the field loses
+                                  its edge entirely and becomes a dark patch of
+                                  card, which is worst for exactly the fields a
+                                  reader most needs to locate: a disabled input
+                                  still SHOWS its value, and showing it is most
+                                  of its job.
+
+     .btn-outline-*               --bs-btn-disabled-color: #555 — 2.4:1 on a
+                                  card, legible only if you already know the
+                                  button is there.
+
+   Both measured on a card surface (#15181d). */
+.form-control:disabled,
+.form-select:disabled,
+.form-control[readonly] {
+  border-color: var(--da-border);
+  background-color: var(--da-surface-2);
+  color: var(--da-muted);
+  opacity: 1;                /* Bootstrap's 0.65 on top of a muted grey is a fade too far */
+}
+
+.btn-outline-secondary,
+.btn-outline-primary,
+.btn-outline-success,
+.btn-outline-danger,
+.btn-outline-warning,
+.btn-outline-info {
+  --bs-btn-disabled-color: var(--da-muted);
+  --bs-btn-disabled-border-color: var(--da-border);
+}
+
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--da-text);
+  --bs-table-border-color: var(--da-border);
+  --bs-table-hover-bg: var(--da-hover);
+  --bs-table-hover-color: #fff;
+}
+
+.table > thead th {
+  color: var(--da-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-bottom-color: var(--da-border-strong);
+}
+
+/* --------------------------------------------------------------------------
+   2. Contrast corrections
+   Cyborg puts white text on primary, success, warning and light. Those land at
+   2.4–3.0:1, under the WCAG AA minimum of 4.5:1. Dark text on the same colours
+   reaches 7.0–8.8:1.
+   -------------------------------------------------------------------------- */
+
+.text-bg-primary,
+.text-bg-success,
+.text-bg-warning {
+  color: #08090b !important;
+}
+
+/* Cyborg's "light" is a dark grey, so it keeps light text. */
+.text-bg-light {
+  color: #fff !important;
+}
+
+.btn-primary,
+.btn-success,
+.btn-warning {
+  --bs-btn-color: #08090b;
+  --bs-btn-hover-color: #08090b;
+  --bs-btn-active-color: #08090b;
+  --bs-btn-disabled-color: #08090b;
+}
+
+/* Every "selected" surface in Bootstrap fills with primary and sets white
+   text. Same 2.99:1 problem in six places, one fix. */
+.nav-tabs .nav-link.active,
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link,
+.page-item.active .page-link,
+.list-group-item.active,
+.dropdown-item.active,
+.dropdown-item:active {
+  color: #08090b;
+}
+
+.progress-bar {
+  color: #08090b;
+}
+
+.progress-bar.bg-danger,
+.progress-bar.bg-info,
+.progress-bar.bg-secondary {
+  color: #fff;
+}
+
+/* Cyborg's purple info (#93c) and red danger (#c00) work as fills but are too
+   dark to read AS text on this background (3.4:1 and 3.3:1). These lightened
+   variants clear 4.5:1 while staying the same hue. Its muted grey (#555) is
+   only 2.6:1, so that lifts too. Primary, success and warning already pass. */
+:root,
+[data-bs-theme="dark"] {
+  --da-info-text: #c07ee8;
+  --da-danger-text: #ff6b6b;
+
+  --bs-info-text-emphasis: var(--da-info-text);
+  --bs-danger-text-emphasis: var(--da-danger-text);
+  /* Not a second hard-coded grey: this is the SAME muted tone as :root sets, and
+     having two that differ by a few points is how they drift apart. The value
+     here used to be #9aa3af, close enough to --da-muted to look like a mistake
+     and far enough to be one. */
+  --bs-secondary-color: var(--da-muted);
+}
+
+.text-info  { color: var(--da-info-text) !important; }
+.text-danger { color: var(--da-danger-text) !important; }
+.link-info  { color: var(--da-info-text) !important; }
+.link-danger { color: var(--da-danger-text) !important; }
+
+.btn-outline-info   { --bs-btn-color: var(--da-info-text);   --bs-btn-border-color: var(--da-info-text); }
+.btn-outline-danger { --bs-btn-color: var(--da-danger-text); --bs-btn-border-color: var(--da-danger-text); }
+.btn-outline-secondary { --bs-btn-color: #9aa3af; --bs-btn-border-color: #6c757d; }
+
+.btn-link { --bs-btn-color: var(--da-accent); --bs-btn-hover-color: #5cbdf0; }
+
+.blockquote-footer,
+cite,
+figure figcaption {
+  color: #9aa3af;
+}
+
+/* --------------------------------------------------------------------------
+   Alerts
+   Cyborg renders contextual alerts as fully saturated slabs — a neon block of
+   #ff8800 with white text on it (2.39:1). Tinted alerts read better and clear
+   AA comfortably.
+   -------------------------------------------------------------------------- */
+
+.alert {
+  border-width: 1px;
+  border-left-width: 3px;
+  box-shadow: var(--da-shadow-sm);
+}
+
+.alert-primary,
+.alert-secondary,
+.alert-success,
+.alert-info,
+.alert-warning,
+.alert-danger,
+.alert-dark,
+.alert-light {
+  color: var(--da-text);
+  background-color: var(--da-surface-2);
+  border-color: var(--da-border);
+}
+
+.alert-primary  { border-left-color: var(--bs-primary);   }
+.alert-success  { border-left-color: var(--bs-success);   }
+.alert-info     { border-left-color: var(--bs-info);      }
+.alert-warning  { border-left-color: var(--bs-warning);   }
+.alert-danger   { border-left-color: var(--bs-danger);    }
+.alert-secondary,
+.alert-dark,
+.alert-light    { border-left-color: var(--da-border-strong); }
+
+.alert .alert-heading { color: var(--bs-emphasis-color); }
+.alert-primary .alert-heading { color: var(--bs-primary); }
+.alert-success .alert-heading { color: var(--bs-success); }
+.alert-warning .alert-heading { color: var(--bs-warning); }
+.alert-danger  .alert-heading { color: var(--da-danger-text); }
+.alert-info    .alert-heading { color: var(--da-info-text);   }
+
+.alert .alert-link { color: var(--da-accent); }
+.alert .btn-close  { filter: invert(1) grayscale(1) brightness(2); }
+
+/* --------------------------------------------------------------------------
+   Focus visibility
+   -------------------------------------------------------------------------- */
+
+:focus-visible {
+  outline: 2px solid var(--da-accent);
+  outline-offset: 2px;
+}
+
+.btn:focus-visible,
+.nav-link:focus-visible,
+.dropdown-item:focus-visible {
+  outline: 2px solid var(--da-accent);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   3. Layout shell
+   -------------------------------------------------------------------------- */
+
+#wrapper {
+  padding-left: 0;
+}
+
+#page-wrapper {
+  width: 100%;
+  padding: 1.25rem 1rem 3rem;
+}
+
+@media (min-width: 768px) {
+  #wrapper {
+    padding-left: var(--da-sidebar-width);
+  }
+
+  #page-wrapper {
+    padding: 1.75rem 2rem 4rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Top navbar
+   -------------------------------------------------------------------------- */
+
+/* No backdrop-filter here: it would create a containing block for the
+   position:fixed sidebar nested inside this navbar, clipping the sidebar to
+   the navbar's own 3.5rem box. */
+.navbar-admin {
+  min-height: var(--da-topbar-height);
+  background-color: var(--da-surface);
+  border-bottom: 1px solid var(--da-border);
+  box-shadow: var(--da-shadow-sm);
+}
+
+.navbar-admin .navbar-brand {
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  color: #fff;
+}
+
+/* The glowing accent dot before the wordmark is dropped for the same reason: a
+   permanently lit indicator beside the title reads as status on a page whose
+   job is showing status. */
+
+.navbar-admin .dropdown-menu {
+  background-color: var(--da-surface);
+  border-color: var(--da-border);
+  box-shadow: var(--da-shadow-lg);
+}
+
+.navbar-search .form-control {
+  min-width: 12rem;
+  border-radius: 999px;
+  background-color: var(--da-surface-2);
+}
+
+/* Replaces Bootstrap 3's .divider-vertical */
+.navbar-divider-vertical {
+  align-self: center;
+  width: 1px;
+  height: 1.5rem;
+  margin: 0 0.75rem;
+  background-color: var(--da-border-strong);
+}
+
+@media (max-width: 767.98px) {
+  .navbar-divider-vertical { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Side navigation
+   The selectors below are deliberately as specific as Bootstrap's own
+   `.navbar-expand-md .navbar-nav .nav-link` rules, which would otherwise win
+   and lay the sidebar out horizontally.
+   -------------------------------------------------------------------------- */
+
+.navbar .navbar-nav.side-nav .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--da-muted);
+  padding: 0.6rem 0.85rem;
+  margin: 0.1rem 0.5rem;
+  border-radius: var(--bs-border-radius);
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navbar .navbar-nav.side-nav .nav-link:hover,
+.navbar .navbar-nav.side-nav .nav-link:focus-visible {
+  color: #fff;
+  background-color: var(--da-hover);
+}
+
+/* The active pill takes the colour of its own nav item, so the highlight
+   matches the icon rather than always being blue. */
+.navbar .navbar-nav.side-nav .nav-link.active {
+  color: #fff;
+  background-color: var(--da-blue-soft);
+  box-shadow: inset 3px 0 0 var(--da-blue);
+}
+
+/* An earlier revision cycled five hues here, so the selected item's colour
+   depended on its POSITION in the list rather than on anything true about it.
+   Removed deliberately: in an admin UI colour should carry meaning -- an alarm,
+   a job running, a connection lost -- and a nav that spends five colours on
+   decoration leaves nothing to say those things with. The single accent above
+   applies to whichever item is active. */
+
+.navbar .navbar-nav.side-nav .nav-link i {
+  width: 1.1rem;
+  text-align: center;
+  font-size: 0.95em;
+  color: var(--da-muted);
+  transition: color 0.15s ease;
+}
+
+/* The five-hue icon cycle is removed for the same reason as the active states
+   above: colour is a signal, not an index. Icons inherit the muted tone set in
+   the rule above, and go white with their label when the item is active. */
+
+@media (min-width: 768px) {
+  .navbar-expand-md .navbar-nav.side-nav {
+    position: fixed;
+    top: var(--da-topbar-height);
+    left: 0;
+    bottom: 0;
+    width: var(--da-sidebar-width);
+    padding-top: 0.75rem;
+    background-color: var(--da-surface);
+    border-right: 1px solid var(--da-border);
+    overflow-y: auto;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    scrollbar-width: thin;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Messages dropdown
+   -------------------------------------------------------------------------- */
+
+.messages-dropdown .dropdown-menu { min-width: 300px; }
+
+.messages-dropdown .message-preview .dropdown-item {
+  white-space: normal;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.messages-dropdown .message-preview .avatar {
+  flex: 0 0 auto;
+  color: var(--da-accent);
+}
+
+.messages-dropdown .message-preview .name { font-weight: 600; }
+
+.messages-dropdown .message-preview .message,
+.messages-dropdown .message-preview .time { font-size: 0.78rem; }
+
+/* --------------------------------------------------------------------------
+   Cards (was .panel in Bootstrap 3)
+   Bootstrap 3 panels used a saturated colour bar for the heading. Modern
+   practice is a quiet header with the colour carried by a small icon, so the
+   accent marks the section without shouting over its own content.
+   -------------------------------------------------------------------------- */
+
+.card {
+  margin-bottom: 1.25rem;
+  border-radius: var(--bs-border-radius-lg);
+  box-shadow: var(--da-shadow);
+}
+
+.card-header {
+  background-color: transparent;
+  border-bottom: 1px solid var(--da-border);
+  padding: 0.85rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.card-header .card-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.card-body { padding: 1.1rem; }
+
+.card-footer {
+  background-color: transparent;
+  border-top: 1px solid var(--da-border);
+}
+
+/* Accent cards: colour lives in the icon and a hairline at the top. */
+.card-accent { position: relative; overflow: hidden; }
+
+.card-accent::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--da-accent), transparent 70%);
+}
+
+.card-accent > .card-header i { color: var(--da-accent); }
+
+.card-accent.border-success::before { background: linear-gradient(90deg, var(--da-green),  transparent 70%); }
+.card-accent.border-warning::before { background: linear-gradient(90deg, var(--da-orange), transparent 70%); }
+.card-accent.border-danger::before  { background: linear-gradient(90deg, var(--da-red),    transparent 70%); }
+.card-accent.border-info::before    { background: linear-gradient(90deg, var(--da-purple), transparent 70%); }
+
+/* The header icon sits on the card surface, so it uses the -text variant. */
+.card-accent.border-success > .card-header i { color: var(--da-green-text); }
+.card-accent.border-warning > .card-header i { color: var(--da-orange-text); }
+.card-accent.border-danger  > .card-header i { color: var(--da-red-text); }
+.card-accent.border-info    > .card-header i { color: var(--da-purple-text); }
+
+/* A 10% wash behind the header so the accent reads as a band, not a hairline.
+   Title lands at 14:1 and the icon at 4.8:1 minimum on these. */
+.card-accent > .card-header            { background-color: rgba(42, 159, 214, 0.10); }
+.card-accent.border-success > .card-header { background-color: rgba(119, 179, 0, 0.10); }
+.card-accent.border-warning > .card-header { background-color: rgba(255, 136, 0, 0.10); }
+.card-accent.border-danger  > .card-header { background-color: rgba(204, 0, 0, 0.12); }
+.card-accent.border-info    > .card-header { background-color: rgba(153, 51, 204, 0.12); }
+
+/* The border-* utilities were only there to tint the old panel frame. */
+.card-accent[class*="border-"] { border-color: var(--da-border) !important; }
+
+/* --------------------------------------------------------------------------
+   KPI tiles
+   The coloured metric row a dashboard opens with. Add .stat-<hue> to pick one
+   of the five theme colours.
+   -------------------------------------------------------------------------- */
+
+.stat-card {
+  --stat: var(--da-blue);
+  --stat-text: var(--da-blue-text);
+  --stat-soft: var(--da-blue-soft);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  padding: 1.1rem;
+  border: 1px solid var(--da-border);
+  border-radius: var(--bs-border-radius-lg);
+  background-color: var(--da-surface);
+  box-shadow: var(--da-shadow);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--stat), transparent 75%);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--da-shadow-lg);
+}
+
+.stat-card .stat-icon {
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  color: var(--stat-text);
+  background-color: var(--stat-soft);
+  border-radius: var(--bs-border-radius);
+}
+
+.stat-card .stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--da-muted);
+}
+
+.stat-card .stat-value {
+  font-size: 1.6rem;
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--bs-emphasis-color);
+}
+
+.stat-card .stat-delta {
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stat-card .stat-delta.up { color: var(--da-green-text); }
+.stat-card .stat-delta.down { color: var(--da-red-text); }
+.stat-card .stat-delta .stat-period {
+  color: var(--da-muted);
+  font-weight: 400;
+}
+
+.stat-blue   { --stat: var(--da-blue);   --stat-text: var(--da-blue-text);   --stat-soft: var(--da-blue-soft); }
+.stat-green  { --stat: var(--da-green);  --stat-text: var(--da-green-text);  --stat-soft: var(--da-green-soft); }
+.stat-purple { --stat: var(--da-purple); --stat-text: var(--da-purple-text); --stat-soft: var(--da-purple-soft); }
+.stat-orange { --stat: var(--da-orange); --stat-text: var(--da-orange-text); --stat-soft: var(--da-orange-soft); }
+.stat-red    { --stat: var(--da-red);    --stat-text: var(--da-red-text);    --stat-soft: var(--da-red-soft); }
+
+/* --------------------------------------------------------------------------
+   Soft badges — tinted rather than solid, readable without a heavy block
+   -------------------------------------------------------------------------- */
+
+.badge-soft-blue   { color: var(--da-blue-text);   background-color: var(--da-blue-soft); }
+.badge-soft-green  { color: var(--da-green-text);  background-color: var(--da-green-soft); }
+.badge-soft-purple { color: var(--da-purple-text); background-color: var(--da-purple-soft); }
+.badge-soft-orange { color: var(--da-orange-text); background-color: var(--da-orange-soft); }
+.badge-soft-red    { color: var(--da-red-text);    background-color: var(--da-red-soft); }
+
+/* --------------------------------------------------------------------------
+   Activity feed
+   -------------------------------------------------------------------------- */
+
+/* The fade makes the scroll cut-off read as intentional rather than as an item
+   sliced in half. Purely decorative — no content depends on it. */
+.feed {
+  max-height: 26rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 2.5rem), transparent 100%);
+  mask-image: linear-gradient(180deg, #000 calc(100% - 2.5rem), transparent 100%);
+}
+
+.feed-item {
+  display: flex;
+  gap: 0.8rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--da-border);
+}
+
+.feed-item:last-child { border-bottom: 0; }
+
+.feed-item .icon {
+  flex: 0 0 1.9rem;
+  width: 1.9rem;
+  height: 1.9rem;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  color: var(--da-accent);
+  background-color: var(--da-accent-soft);
+  border-radius: 50%;
+}
+
+/* Feed icons carry the colour of what happened, not one flat blue. */
+.feed-item .icon.blue   { color: var(--da-blue-text);   background-color: var(--da-blue-soft); }
+.feed-item .icon.green  { color: var(--da-green-text);  background-color: var(--da-green-soft); }
+.feed-item .icon.purple { color: var(--da-purple-text); background-color: var(--da-purple-soft); }
+.feed-item .icon.orange { color: var(--da-orange-text); background-color: var(--da-orange-soft); }
+.feed-item .icon.red    { color: var(--da-red-text);    background-color: var(--da-red-soft); }
+
+.feed-item-body .time {
+  color: var(--da-muted);
+  font-size: 0.75rem;
+  margin-top: 0.15rem;
+}
+
+/* --------------------------------------------------------------------------
+   News / user lists and server stats
+   -------------------------------------------------------------------------- */
+
+.news-list,
+.users-list,
+.server-stats {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.news-list li,
+.users-list li {
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 0.7rem 0.5rem;
+  border-radius: var(--bs-border-radius);
+  border-top: 1px solid var(--da-border);
+  transition: background-color 0.15s ease;
+}
+
+.news-list li:first-child,
+.users-list li:first-child { border-top: 0; }
+
+.news-list:not(.news-list-no-hover) li:hover { background-color: var(--da-hover); }
+
+.news-list .avatar,
+.users-list .avatar {
+  flex: 0 0 2.6rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+  color: var(--da-muted);
+  background-color: var(--da-surface-2);
+  border: 1px solid var(--da-border);
+  border-radius: 50%;
+}
+
+/* Avatars cycle the palette so a list of people isn't a column of grey discs. */
+.news-list li:nth-child(5n + 1) .avatar,
+.users-list li:nth-child(5n + 1) .avatar { color: var(--da-blue-text);   background-color: var(--da-blue-soft); }
+.news-list li:nth-child(5n + 2) .avatar,
+.users-list li:nth-child(5n + 2) .avatar { color: var(--da-green-text);  background-color: var(--da-green-soft); }
+.news-list li:nth-child(5n + 3) .avatar,
+.users-list li:nth-child(5n + 3) .avatar { color: var(--da-purple-text); background-color: var(--da-purple-soft); }
+.news-list li:nth-child(5n + 4) .avatar,
+.users-list li:nth-child(5n + 4) .avatar { color: var(--da-orange-text); background-color: var(--da-orange-soft); }
+.news-list li:nth-child(5n + 5) .avatar,
+.users-list li:nth-child(5n + 5) .avatar { color: var(--da-red-text);    background-color: var(--da-red-soft); }
+
+.news-item-info { min-width: 0; }
+.news-item-info .name { font-weight: 600; }
+
+.news-item-info .position,
+.news-item-info .time,
+.news-item-info .comment {
+  font-size: 0.8rem;
+  color: var(--da-muted);
+}
+
+.server-stats li + li { margin-top: 1rem; }
+
+.server-stats .info {
+  font-size: 0.8rem;
+  color: var(--da-muted);
+  margin-bottom: 0.3rem;
+}
+
+.progress-small {
+  height: 0.4rem;
+  background-color: var(--da-surface-2);
+}
+
+.tab-header {
+  color: var(--da-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   Sortable tables (replaces the ShieldUI grid)
+   -------------------------------------------------------------------------- */
+
+table.sortable th[data-sort] {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+table.sortable th[data-sort]:hover { color: var(--da-text); }
+
+table.sortable th[data-sort]::after {
+  content: "\f0dc"; /* fa-sort */
+  font-family: "Font Awesome 7 Free", "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 0.75em;
+  margin-left: 0.45em;
+  opacity: 0.3;
+}
+
+table.sortable th[aria-sort="ascending"]::after  { content: "\f0de"; opacity: 1; color: var(--da-accent); }
+table.sortable th[aria-sort="descending"]::after { content: "\f0dd"; opacity: 1; color: var(--da-accent); }
+
+/* --------------------------------------------------------------------------
+   Timeline
+   -------------------------------------------------------------------------- */
+
+/* Single-sided rail, replacing the original alternating float layout.
+   Alternating sides cannot avoid dead space: each entry is its own grid row, so
+   a panel on the left always leaves a panel-height hole on the right. Only
+   masonry (not yet baseline) or display:contents (which drops list semantics
+   for screen readers) would interlock them. A single rail sidesteps it and is
+   what current admin UIs use. `.timeline-inverted` is now a harmless no-op, so
+   existing markup keeps working. */
+.timeline {
+  list-style: none;
+  padding: 0.5rem 0;
+  margin: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 1.3rem;
+  width: 2px;
+  margin-left: -1px;
+  background: linear-gradient(180deg, transparent, var(--da-border-strong) 4%, var(--da-border-strong) 96%, transparent);
+}
+
+.timeline > li {
+  display: grid;
+  grid-template-columns: 2.6rem 1fr;
+  column-gap: 1.25rem;
+  align-items: start;
+}
+
+.timeline > li > .timeline-panel {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--da-border);
+  border-radius: var(--bs-border-radius-lg);
+  background-color: var(--da-surface);
+  box-shadow: var(--da-shadow);
+}
+
+/* Arrow pointing back at the rail. */
+.timeline > li > .timeline-panel::before {
+  content: "";
+  position: absolute;
+  top: 1.35rem;
+  left: -0.5rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  transform: rotate(45deg);
+  background-color: var(--da-surface);
+  border-bottom: 1px solid var(--da-border);
+  border-left: 1px solid var(--da-border);
+}
+
+.timeline > li > .timeline-badge {
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 10;
+  width: 2.6rem;
+  height: 2.6rem;
+  margin-top: 0.7rem;
+  display: grid;
+  place-items: center;
+  font-size: 0.95rem;
+  color: #08090b;
+  background-color: var(--da-muted);
+  border: 3px solid var(--da-bg);
+  border-radius: 50%;
+  box-shadow: var(--da-shadow);
+}
+
+.timeline-badge.primary { background-color: var(--bs-primary) !important; }
+.timeline-badge.success { background-color: var(--bs-success) !important; }
+.timeline-badge.warning { background-color: var(--bs-warning) !important; }
+.timeline-badge.info    { background-color: var(--bs-info) !important; color: #fff; }
+.timeline-badge.danger  { background-color: var(--bs-danger) !important; color: #fff; }
+
+.timeline-title {
+  margin-top: 0;
+  color: var(--bs-heading-color);
+}
+
+.timeline-body > p,
+.timeline-body > ul { margin-bottom: 0; }
+.timeline-body > p + p { margin-top: 0.3rem; }
+
+@media (max-width: 767.98px) {
+  .timeline > li { column-gap: 0.85rem; }
+  .timeline > li > .timeline-panel { padding: 0.9rem 1rem; }
+}
+
+/* --------------------------------------------------------------------------
+   Misc
+   -------------------------------------------------------------------------- */
+
+/* Cyborg fills breadcrumbs with a solid bar; a plain trail reads better. */
+.breadcrumb {
+  background-color: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  margin-bottom: 0.5rem;
+}
+
+.page-header {
+  padding-bottom: 0.75rem;
+  margin: 2rem 0 1.25rem;
+  border-bottom: 1px solid var(--da-border);
+}
+
+#page-wrapper > .page-header:first-child { margin-top: 0; }
+
+.thumb-card img {
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.thumb-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.thumb-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--da-shadow-lg);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--da-hover);
+  border-radius: 999px;
+  border: 2px solid var(--da-bg);
+}
+::-webkit-scrollbar-thumb:hover { background: #333a45; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Palette fill utilities
+   Dark text on all five, which is what the measured ratios call for except on
+   purple and red, where white wins.
+   -------------------------------------------------------------------------- */
+
+.bg-da-blue   { background-color: var(--da-blue) !important;   color: #08090b; }
+.bg-da-green  { background-color: var(--da-green) !important;  color: #08090b; }
+.bg-da-orange { background-color: var(--da-orange) !important; color: #08090b; }
+.bg-da-purple { background-color: var(--da-purple) !important; color: #fff; }
+.bg-da-red    { background-color: var(--da-red) !important;    color: #fff; }
+
+.text-da-blue   { color: var(--da-blue-text) !important; }
+.text-da-green  { color: var(--da-green-text) !important; }
+.text-da-purple { color: var(--da-purple-text) !important; }
+.text-da-orange { color: var(--da-orange-text) !important; }
+.text-da-red    { color: var(--da-red-text) !important; }
+
+/* An earlier revision painted the wordmark with a background gradient clipped
+   to the text (white -> blue -> purple). Removed: colour here carries meaning,
+   and a product name is not state. Plain text also drops the three-way fallback
+   the gradient required -- background-clip:text renders text INVISIBLE wherever
+   it is unsupported, so the gradient had to restore a solid colour for old
+   engines and for Windows High Contrast. Plain text needs none of that. */
+
+@media print {
+  .navbar-admin .navbar-brand { color: #000; }
+}
+
+/* Inline code picks up the accent instead of sitting grey.
+   The chip is OPAQUE on purpose. A translucent tint composites with whatever
+   is behind it, so the same chip measured 5.06:1 on the page but only 4.04:1
+   inside a lighter hero block. An opaque chip is context-independent: 5.98:1
+   everywhere. */
+code {
+  color: #c084e6;
+  background-color: #251b34;
+  padding: 0.12em 0.36em;
+  border-radius: 0.25rem;
+}
+
+pre code {
+  color: inherit;
+  background: none;
+  padding: 0;
+}
+
+/* Sorted column header reads as active. */
+table.sortable th[aria-sort="ascending"],
+table.sortable th[aria-sort="descending"] {
+  color: var(--da-blue-text);
+}
