@@ -298,3 +298,50 @@
     font-size: 1.5rem;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Terminal mode — an easter egg. Typing "pipboy" on any page puts
+   .terminal-mode on <html> (js/dark-admin.js): green phosphor, scanlines and
+   a monospace face, after the wrist computers of the Fallout games.
+
+   The filter is on the root element on purpose. On any other element it
+   would make that element the containing block of the fixed sidebar and
+   clip it (docs/skin-notes.md, "Theme invariants"); on the root it does not.
+   It also reaches the chart canvases, which no custom property does once
+   they are drawn.
+   -------------------------------------------------------------------------- */
+
+html.terminal-mode {
+  filter: grayscale(1) sepia(1) hue-rotate(75deg) saturate(3.4) brightness(0.95) contrast(1.1);
+}
+
+html.terminal-mode body {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, "DejaVu Sans Mono", Menlo, monospace;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.22);
+}
+
+/* Scanlines, over everything and out of the mouse's way. */
+html.terminal-mode body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, transparent 0, transparent 2px, rgba(0, 0, 0, 0.24) 3px);
+}
+
+.terminal-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  z-index: 2001;
+  max-width: calc(100vw - 2rem);
+  padding: 0.6rem 1rem;
+  transform: translateX(-50%);
+  border: 1px solid var(--da-border-strong);
+  border-radius: 0.5rem;
+  background-color: var(--da-surface-2);
+  color: var(--da-text);
+  font-size: 0.875rem;
+  text-align: center;
+}

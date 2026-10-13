@@ -101,9 +101,80 @@
     Chart.defaults.plugins.tooltip.cornerRadius = 8;
   }
 
+  /* ----------------------------------------------------------------------
+     Terminal mode: an easter egg. Type "pipboy" on any page and it becomes
+     a green phosphor screen, after the wrist computers of the Fallout
+     games; type it again to go back. With no keyboard, "#pipboy" on the end
+     of the address switches it on and "#pipboy-off" switches it off. The
+     choice is kept in the browser, so it follows from page to page.
+
+     All of the look is in css/weewx-dark.css, under .terminal-mode.
+     ---------------------------------------------------------------------- */
+  var TERMINAL_WORD = 'pipboy';
+  var TERMINAL_KEY = 'darkadmin-terminal';
+
+  function terminalRemembered() {
+    try {
+      return localStorage.getItem(TERMINAL_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function terminalSay(text) {
+    var old = document.querySelector('.terminal-toast');
+    if (old) old.remove();
+    var toast = document.createElement('div');
+    toast.className = 'terminal-toast';
+    toast.setAttribute('role', 'status');
+    toast.textContent = text;
+    document.body.appendChild(toast);
+    setTimeout(function () { toast.remove(); }, 6000);
+  }
+
+  function setTerminal(on, announce) {
+    document.documentElement.classList.toggle('terminal-mode', on);
+    try {
+      localStorage.setItem(TERMINAL_KEY, on ? '1' : '0');
+    } catch (e) {
+      // No storage (private browsing, say): it lasts for this page only.
+    }
+    if (announce) {
+      terminalSay(on
+        ? '☢ Terminal mode. War never changes. The weather does. Type "' + TERMINAL_WORD + '" again to leave.'
+        : 'Terminal mode off.');
+    }
+  }
+
+  function terminalFromAddress() {
+    var hash = location.hash.toLowerCase();
+    if (hash === '#' + TERMINAL_WORD) setTerminal(true, true);
+    if (hash === '#' + TERMINAL_WORD + '-off') setTerminal(false, true);
+  }
+
+  function enableTerminalMode() {
+    var typed = '';
+    document.addEventListener('keydown', function (event) {
+      if (event.ctrlKey || event.metaKey || event.altKey || event.key.length !== 1) return;
+      var where = event.target;
+      if (where && (where.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(where.tagName))) return;
+      typed = (typed + event.key.toLowerCase()).slice(-TERMINAL_WORD.length);
+      if (typed === TERMINAL_WORD) {
+        typed = '';
+        setTerminal(!document.documentElement.classList.contains('terminal-mode'), true);
+      }
+    });
+    window.addEventListener('hashchange', terminalFromAddress);
+    terminalFromAddress();
+  }
+
+  // Before the charts are drawn, so that they pick the terminal's typeface up.
+  if (terminalRemembered()) document.documentElement.classList.add('terminal-mode');
+
   document.addEventListener('DOMContentLoaded', function () {
     markActiveNav();
     enableSortableTables();
     applyChartDefaults();
+    enableTerminalMode();
   });
 })();
